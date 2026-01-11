@@ -1,7 +1,7 @@
 """
 Parser PDB avancé pour extraction de features structuraux.
 Basé sur 10_chromophore_advanced.py du projet master.
-Version corrigée: ajout chromophore_triplet
+Version corrigée: ajout chromophore_triplet + fix détection chemin/contenu
 """
 
 import numpy as np
@@ -29,10 +29,32 @@ class PDBParser:
         self.chromophore_triplet: Optional[str] = None  # Ex: "SYG", "TYG"
         self._chromophore_ids: Optional[Tuple[int, int, int]] = None
         
-        if isinstance(source, (str, Path)) and Path(source).exists():
+        # Détecter si c'est un chemin ou du contenu PDB
+        # Un contenu PDB contient des newlines ou commence par ATOM/MODEL/HEADER
+        is_content = (
+            isinstance(source, str) and (
+                '\n' in source or
+                source.startswith('ATOM') or
+                source.startswith('MODEL') or
+                source.startswith('HEADER') or
+                source.startswith('REMARK') or
+                len(source) > 500  # Les chemins sont courts
+            )
+        )
+        
+        if isinstance(source, Path):
+            # C'est explicitement un Path
+            with open(source, 'r', encoding='utf-8', errors='ignore') as f:
+                self._parse(f)
+        elif is_content:
+            # C'est du contenu PDB brut
+            self._parse(StringIO(source))
+        elif isinstance(source, str) and Path(source).exists():
+            # C'est un chemin string vers un fichier existant
             with open(source, 'r', encoding='utf-8', errors='ignore') as f:
                 self._parse(f)
         elif isinstance(source, str):
+            # Fallback: traiter comme contenu même si pas de newline
             self._parse(StringIO(source))
         else:
             raise ValueError("Source doit être un chemin ou contenu PDB")
