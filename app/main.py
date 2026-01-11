@@ -10,9 +10,9 @@ Features:
 - Push des résultats via WebSocket
 - Polling via REST
 
-Version: 2.1.0 (sans ESM-2, 85 features)
+Version: 2.1.0
 Auteur: Panda
-Projet: FPbase Master - PNPH
+Projet: FPbase Master
 """
 
 import asyncio
@@ -48,7 +48,7 @@ async def lifespan(app: FastAPI):
     # Charger le prédicteur (modèles joblib)
     predictor = get_predictor()
     if predictor.ready:
-        logger.info("✅ Modèles chargés (85 features, sans ESM-2)")
+        logger.info("✅ Modèles chargés 85 features")
     else:
         logger.warning("⚠️ Modèles non disponibles!")
     
@@ -81,9 +81,8 @@ app = FastAPI(
     
     - ExtraTrees Regressor (85 features)
     - Features: structural + RDKit + classification
-    - MAE: ~17nm (émission), ~21nm (excitation)
-    
-    Développé dans le cadre du projet PNPH.
+    - 9.79nm (em) / 11.43nm (ex)
+
     """,
     version="2.1.0",
     lifespan=lifespan
@@ -739,7 +738,7 @@ LANDING_PAGE = """
         <nav class="nav-links">
             <a href="/docs" class="nav-link">API Docs</a>
             <a href="/health" class="nav-link">Status</a>
-            <a href="https://github.com/Pmusic-FP/fp-predict-api" class="nav-link" target="_blank">GitHub</a>
+            <a href="https://github.com/yannbanas" class="nav-link" target="_blank">GitHub</a>
         </nav>
     </header>
     
@@ -753,7 +752,7 @@ LANDING_PAGE = """
             <div class="badges">
                 <span class="badge green">✓ 85 Features</span>
                 <span class="badge blue">⚡ ExtraTrees ML</span>
-                <span class="badge purple">🎯 MAE ~17nm</span>
+                <span class="badge purple">🎯 MAE 9.79nm (em) / 11.43nm (ex)</span>
             </div>
         </section>
         
@@ -824,17 +823,17 @@ LANDING_PAGE = """
                 <div class="feature-card">
                     <div class="feature-icon">🔬</div>
                     <h3>Feature Extraction</h3>
-                    <p>85 structural features are extracted including chromophore geometry, RDKit descriptors, and pLDDT scores.</p>
+                    <p>85 structural features extracted: chromophore geometry (ψ, φ, χ angles), RDKit molecular descriptors, and pLDDT confidence scores.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">🤖</div>
                     <h3>ML Prediction</h3>
-                    <p>ExtraTrees regressor predicts excitation and emission wavelengths with ~17nm MAE accuracy.</p>
+                    <p>ExtraTrees regressor optimized for green FPs predicts wavelengths with 9.79nm MAE (emission) and 11.43nm MAE (excitation).</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">📊</div>
                     <h3>Get Results</h3>
-                    <p>Receive predictions via WebSocket in real-time or poll the REST API for results.</p>
+                    <p>Receive predictions via WebSocket in real-time or poll the REST API. Results include λex, λem, Stokes shift and chromophore info.</p>
                 </div>
             </div>
         </section>
@@ -852,14 +851,14 @@ LANDING_PAGE = """
 <span class="code-comment"># Submit PDB file</span>
 <span class="code-keyword">with</span> <span class="code-function">open</span>(<span class="code-string">"protein.pdb"</span>, <span class="code-string">"rb"</span>) <span class="code-keyword">as</span> f:
     response = requests.post(
-        <span class="code-string">"https://your-api.railway.app/jobs/submit"</span>,
+        <span class="code-string">"https://fp-predict-api-production.up.railway.app/jobs/submit"</span>,
         files={<span class="code-string">"file"</span>: f}
     )
 
 job_id = response.json()[<span class="code-string">"job_id"</span>]
 
 <span class="code-comment"># Poll for results</span>
-result = requests.get(<span class="code-string">f"https://your-api.railway.app/jobs/{job_id}"</span>)
+result = requests.get(<span class="code-string">f"https://fp-predict-api-production.up.railway.app/jobs/{job_id}"</span>)
 <span class="code-function">print</span>(result.json())</code></pre>
             </div>
             
@@ -869,18 +868,18 @@ result = requests.get(<span class="code-string">f"https://your-api.railway.app/j
                     <button class="copy-btn" onclick="copyCode('curl-code')">Copy</button>
                 </div>
                 <pre><code id="curl-code"><span class="code-comment"># Submit job</span>
-curl -X POST "https://your-api.railway.app/jobs/submit" \
+curl -X POST "https://fp-predict-api-production.up.railway.app/jobs/submit" \
   -F "file=@protein.pdb"
 
 <span class="code-comment"># Get results</span>
-curl "https://your-api.railway.app/jobs/{job_id}"</code></pre>
+curl "https://fp-predict-api-production.up.railway.app/jobs/{job_id}"</code></pre>
             </div>
         </section>
     </main>
     
     <footer>
         <p>
-            Built with ❤️ for the <strong>PNPH Project</strong> | 
+            ©BanasTechnologie | 
             <a href="/docs">API Documentation</a> | 
             v2.1.0
         </p>
