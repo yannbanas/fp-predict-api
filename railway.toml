@@ -1,0 +1,24 @@
+# ============================================================
+# FP-Predict API - Railway Configuration
+# Version 2.1.0
+# ============================================================
+
+[build]
+# Utiliser le Dockerfile
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+# Port de l'application
+numReplicas = 1
+
+# Health check
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+
+# Politique de redémarrage
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+# Timeout de démarrage (RDKit peut prendre quelques secondes)
+startCommand = "uvicorn app.main:app --host 0.0.0.0 --port $PORT"

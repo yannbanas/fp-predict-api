@@ -1,0 +1,38 @@
+# ============================================================
+# FP-Predict API - Docker Compose
+# Version 2.1.0
+# ============================================================
+
+version: '3.8'
+
+services:
+  fp-predict-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fp-predict-api:2.1.0
+    container_name: fp-predict-api
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    # volumes:
+      # Monter les modèles (optionnel si déjà dans app/models/)
+      # - ./models:/app/models:ro
+      # Pour le développement (hot reload)
+      # - ./app:/app/app:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    
+    # Limites ressources (optionnel)
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
