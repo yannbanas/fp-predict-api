@@ -1,7 +1,8 @@
 # ============================================================
 # FP-Predict API - Dockerfile
 # ============================================================
-# Version 2.1.0
+# Version 2.1.0 - 85 features (structural + RDKit + classification)
+# Sans ESM-2 - Léger et rapide
 # ============================================================
 
 FROM python:3.11-slim
@@ -40,12 +41,12 @@ COPY --chown=appuser:appuser app/ ./app/
 # Changer vers utilisateur non-root
 USER appuser
 
-# Port
+# Port (Railway injecte $PORT automatiquement)
 EXPOSE 8000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1
+# Health check simplifié
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+    CMD python -c "import os; import urllib.request; urllib.request.urlopen(f'http://localhost:{os.environ.get(\"PORT\", 8000)}/health')" || exit 1
 
-# Démarrage
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Démarrage - shell form pour interpréter $PORT
+CMD sh -c "uvicorn app.main:app --host 0.0.0.0 --port \$PORT"
